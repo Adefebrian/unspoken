@@ -2,6 +2,11 @@
 # First-boot setup for the Oracle A1 (Ubuntu aarch64) host.
 # NO secrets here (cloud-init lives in instance metadata). Only OS + Docker +
 # baseline hardening. The app's .env is added later over SSH.
+
+# Authorized SSH key (public key — safe to share). Added to the default user.
+ssh_authorized_keys:
+  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEHevgFfqFWr0Zp1T+U62WKbclRcbAER7gVK8oXOwLgY brian
+
 package_update: true
 package_upgrade: true
 packages:
