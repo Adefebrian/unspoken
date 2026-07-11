@@ -1,0 +1,16 @@
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    expose:
+      - "3000"
+    # No published ports: Cloudflare Tunnel reaches the app over the internal
+    # network, so the VM needs zero inbound ports open (only SSH).
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token ${CF_TUNNEL_TOKEN}
+    depends_on:
+      - app

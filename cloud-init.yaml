@@ -1,0 +1,14 @@
+#cloud-config
+# First-boot setup for the Oracle A1 (Ubuntu aarch64) host. Installs Docker +
+# git only. NO secrets here (cloud-init is stored in instance metadata).
+package_update: true
+package_upgrade: true
+packages:
+  - git
+  - ca-certificates
+  - curl
+runcmd:
+  # Official Docker install (docker-ce + compose v2 plugin), works on arm64.
+  - sh -c "curl -fsSL https://get.docker.com | sh"
+  - systemctl enable --now docker
+  - usermod -aG docker ubuntu

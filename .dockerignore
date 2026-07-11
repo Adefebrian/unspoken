@@ -1,0 +1,10 @@
+node_modules
+.git
+.env
+.env.local
+*.log
+public/index.html
+public/assets/*.js
+public/assets/*.css
+public/assets/*.map
+.DS_Store

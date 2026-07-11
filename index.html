@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+    <title>unspoken · say what you never could, anonymously</title>
+    <meta
+      name="description"
+      content="unspoken is a free, anonymous wall for the words you never got to say. No names, no judgment. Write what's on your heart and read what others carry."
+    />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="theme-color" content="#f3efe6" />
+    <link rel="canonical" href="%SITE_URL%/" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="unspoken" />
+    <meta property="og:title" content="unspoken · say what you never could" />
+    <meta
+      property="og:description"
+      content="A free, anonymous wall for the words you never got to say. No names, no judgment."
+    />
+    <meta property="og:url" content="%SITE_URL%/" />
+    <meta property="og:image" content="%SITE_URL%/og.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="unspoken: say what you never could" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="unspoken · say what you never could" />
+    <meta
+      name="twitter:description"
+      content="A free, anonymous wall for the words you never got to say."
+    />
+    <meta name="twitter:image" content="%SITE_URL%/og.png" />
+    <meta name="twitter:image:alt" content="unspoken: say what you never could" />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/icon-180.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="modulepreload" href="%JS%" />
+    <link rel="preload" href="/fonts/inter.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/shantell-sans.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="%CSS%" />
+
+    <!-- Structured data for search + generative engines -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "%SITE_URL%/#org",
+            "name": "unspoken",
+            "url": "%SITE_URL%/",
+            "logo": "%SITE_URL%/og.png",
+            "description": "A free, anonymous wall for the words you never got to say.",
+            "sameAs": [
+              "https://instagram.com/brianeedsleep",
+              "https://x.com/brianeedsleep",
+              "https://t.me/adefebrianft"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "%SITE_URL%/#website",
+            "url": "%SITE_URL%/",
+            "name": "unspoken",
+            "description": "A free, anonymous wall for the words you never got to say.",
+            "publisher": { "@id": "%SITE_URL%/#org" },
+            "inLanguage": "en"
+          },
+          {
+            "@type": "WebApplication",
+            "name": "unspoken",
+            "url": "%SITE_URL%/",
+            "applicationCategory": "SocialNetworkingApplication",
+            "operatingSystem": "Any (web browser)",
+            "browserRequirements": "Requires JavaScript",
+            "description": "unspoken is a free, anonymous confession wall where anyone can post what they never got to say and react to others with relate or hug. No account, no names.",
+            "isAccessibleForFree": true,
+            "publisher": { "@id": "%SITE_URL%/#org" },
+            "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+          },
+          {
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "What is unspoken?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "unspoken is a free, anonymous online wall where anyone can write the things they never got to say and read what other people are quietly carrying. There is no sign-up and no names."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Is unspoken really anonymous?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes. There are no accounts and no name fields. We never store your IP address in raw form, only a salted one-way hash used to prevent spam."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Is unspoken free?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes, unspoken is completely free to use. Just open the site, write, and let it out."
+                }
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <!-- Crawlable static content + loading shell. Replaced by the app once JS runs. -->
+    <div id="root">
+      <div class="mx-auto max-w-4xl px-5 py-8 sm:px-6">
+        <p class="text-[1.55rem] font-extrabold lowercase tracking-[-0.03em] text-ink">
+          unspoken<span class="text-sage">.</span>
+        </p>
+        <header class="pb-4 pt-10 text-center">
+          <h1 class="font-hand text-[2.9rem] font-bold leading-[1.02] text-ink sm:text-6xl">
+            let it all out.
+          </h1>
+          <p class="mx-auto mt-3 max-w-xl text-[15px] leading-relaxed text-ink-soft">
+            unspoken is a free, anonymous wall for the words you never got to say. no sign-up,
+            no names, no judgment. write what's been sitting on your chest, and read what others
+            are quietly carrying too.
+          </p>
+        </header>
+
+        <section class="mx-auto mt-8 max-w-xl text-[15px] leading-relaxed text-ink-soft">
+          <h2 class="font-hand text-2xl text-ink">what is unspoken?</h2>
+          <p class="mt-2">
+            unspoken is an anonymous confession wall. people leave short letters about love,
+            loss, regret, family, and the things they can never say out loud, then others react
+            with relate or hug. it is a soft, safe corner of the internet for everything left unsaid.
+          </p>
+          <h2 class="mt-6 font-hand text-2xl text-ink">how it works</h2>
+          <ol class="mt-2 list-decimal space-y-1 pl-5">
+            <li>write anything you have been holding in. no account needed.</li>
+            <li>send it anonymously to the wall.</li>
+            <li>read what others are carrying and react with relate or hug.</li>
+          </ol>
+          <h2 class="mt-6 font-hand text-2xl text-ink">is it anonymous?</h2>
+          <p class="mt-2">
+            yes. there are no names and no accounts. your IP is never stored in raw form, only a
+            salted hash used to keep the wall free of spam. unspoken is free to use.
+          </p>
+        </section>
+      </div>
+    </div>
+    <noscript>
+      <div style="max-width: 40rem; margin: 2rem auto; padding: 0 1.25rem; font-family: sans-serif; color: #22221e;">
+        <h1>unspoken</h1>
+        <p>
+          unspoken is a free, anonymous wall for the words you never got to say. Please enable
+          JavaScript to write and read confessions.
+        </p>
+      </div>
+    </noscript>
+    <script type="module" src="%JS%"></script>
+  </body>
+</html>

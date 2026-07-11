@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    env:
+      # Dummy values so env validation + tests run without real secrets.
+      DATABASE_URL: postgres://ci:ci@localhost:5432/ci
+      IP_SALT: ci-dummy-salt-0123456789abcdef
+      PUBLIC_SITE_URL: https://unspoken.zone
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - name: Typecheck
+        run: bun run typecheck
+      - name: Unit tests
+        run: bun test
+      - name: Production build
+        run: bun run build

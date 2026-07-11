@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="16%" r="80%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.6"/>
+      <stop offset="60%" stop-color="#f3efe6" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="#f3efe6"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+  <g text-anchor="middle" font-family="Inter, 'Helvetica Neue', Arial, sans-serif">
+    <text x="600" y="308" font-size="150" font-weight="800" letter-spacing="-6" fill="#22221e">unspoken<tspan fill="#6f8163">.</tspan></text>
+    <text x="600" y="388" font-size="44" font-weight="500" letter-spacing="-1" fill="#5f5b52">say what you never could</text>
+    <text x="600" y="474" font-size="28" font-weight="400" fill="#938d7f">a free, anonymous wall for the words left unsaid</text>
+  </g>
+</svg>

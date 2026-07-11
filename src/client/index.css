@@ -1,0 +1,374 @@
+@import "tailwindcss";
+
+/* Self-hosted variable fonts (latin subset) — no third-party render-block. */
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("/fonts/inter.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Shantell Sans";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/fonts/shantell-sans.woff2") format("woff2");
+}
+
+@theme {
+  --color-paper: #f3efe6;
+  --color-paper-2: #ebe4d6;
+  --color-card: #fdfcf8;
+  --color-ink: #22221e;
+  --color-ink-soft: #5f5b52;
+  --color-ink-faint: #938d7f;
+  --color-line: #d8d0bd;
+  --color-sage: #6f8163;
+  --color-sage-soft: #e9eee1;
+  --color-blush: #cd7f6f;
+  --color-blush-soft: #f6e8e3;
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-hand: "Shantell Sans", "Segoe Script", cursive;
+
+  --radius-note: 16px;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    background-color: var(--color-paper);
+    background-image:
+      radial-gradient(140% 60% at 50% -20%, rgba(255, 255, 255, 0.5), transparent 55%),
+      radial-gradient(90% 55% at 100% 0%, rgba(205, 127, 111, 0.05), transparent 55%),
+      radial-gradient(90% 55% at 0% 100%, rgba(111, 129, 99, 0.06), transparent 55%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    letter-spacing: -0.01em;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background: var(--color-sage);
+    color: var(--color-paper);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-sage);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+}
+
+@layer components {
+  /* --- Notes ------------------------------------------------------------ */
+  .note {
+    position: relative;
+    background: var(--color-card);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-note);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.7) inset,
+      0 16px 34px -24px rgba(35, 35, 31, 0.55);
+  }
+
+  /* Composer reads as the primary input. */
+  .composer {
+    border-width: 1.5px;
+    border-color: color-mix(in srgb, var(--color-ink) 16%, var(--color-line));
+    box-shadow: 0 22px 46px -28px rgba(35, 35, 31, 0.5);
+  }
+  .composer:focus-within {
+    border-color: color-mix(in srgb, var(--color-sage) 70%, var(--color-line));
+    box-shadow:
+      0 0 0 3px var(--color-sage-soft),
+      0 22px 46px -28px rgba(35, 35, 31, 0.5);
+  }
+
+  .note-hand {
+    font-family: var(--font-hand);
+    font-weight: 500;
+    line-height: 1.45;
+    color: var(--color-ink);
+    letter-spacing: 0;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  /* The letter body is a button that opens the full letter. */
+  .note-open {
+    display: block;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  /* Clamp long notes in the wall; full text opens in the letter modal. */
+  .note-clamp {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* --- Wall: real grid, top-aligned rows and columns (consistent) ------- */
+  .wall {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.1rem;
+    align-items: stretch;
+  }
+  @media (min-width: 720px) {
+    .wall {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .wall .note {
+    height: 100%;
+    transition:
+      transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.3s ease;
+  }
+  @media (hover: hover) {
+    .wall .note:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 26px 46px -26px rgba(35, 35, 31, 0.6);
+    }
+  }
+
+  /* --- Chips (reactions) ------------------------------------------------ */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-line);
+    background: var(--color-paper);
+    padding: 0.5rem 0.85rem;
+    min-height: 40px;
+    font-size: 0.82rem;
+    color: var(--color-ink-soft);
+    transition:
+      transform 0.15s ease,
+      background 0.18s ease,
+      color 0.18s ease,
+      border-color 0.18s ease;
+  }
+  @media (hover: hover) {
+    .chip:hover:not(:disabled) {
+      transform: translateY(-1px);
+    }
+  }
+  .chip:active:not(:disabled) {
+    transform: scale(0.92);
+  }
+  .chip:disabled {
+    cursor: default;
+  }
+  .chip--relate.is-on {
+    background: var(--color-sage-soft);
+    border-color: color-mix(in srgb, var(--color-sage) 45%, transparent);
+    color: var(--color-sage);
+  }
+  .chip--hug.is-on {
+    background: var(--color-blush-soft);
+    border-color: color-mix(in srgb, var(--color-blush) 50%, transparent);
+    color: var(--color-blush);
+  }
+  .count-pop {
+    display: inline-block;
+    animation: countPop 0.3s ease;
+  }
+
+  /* --- Letter modal ----------------------------------------------------- */
+  .letter-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: grid;
+    place-items: center;
+    padding: clamp(0.7rem, 3vw, 1.25rem);
+    background: rgba(30, 30, 27, 0.5);
+    backdrop-filter: blur(6px) saturate(1.05);
+    animation: fadeIn 0.28s ease both;
+  }
+  .letter {
+    position: relative;
+    width: min(640px, 100%);
+    max-height: 86dvh;
+    overflow: auto;
+    background: var(--color-card);
+    border: 1px solid var(--color-line);
+    border-radius: 20px;
+    padding: clamp(1.75rem, 1rem + 3vw, 3rem);
+    box-shadow: 0 40px 80px -30px rgba(20, 20, 18, 0.7);
+    animation: letterIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  /* Bit of washi tape at the top. */
+  .letter::before {
+    content: "";
+    position: absolute;
+    top: -13px;
+    left: 50%;
+    width: 118px;
+    height: 26px;
+    transform: translateX(-50%) rotate(-1.5deg);
+    background: color-mix(in srgb, var(--color-sage) 22%, transparent);
+    border: 1px dashed color-mix(in srgb, var(--color-sage) 45%, transparent);
+    border-radius: 3px;
+  }
+  .letter.is-leaving {
+    animation: letterOut 0.24s ease both;
+  }
+  .letter-backdrop.is-leaving {
+    animation: fadeOut 0.24s ease both;
+  }
+
+  /* Warm post-submit reassurance: small, minimal, on-brand. */
+  .released {
+    position: relative;
+    width: min(380px, 100%);
+    text-align: center;
+    background: var(--color-card);
+    border: 1px solid var(--color-line);
+    border-radius: 20px;
+    padding: 2.25rem 1.75rem;
+    box-shadow: 0 40px 80px -30px rgba(20, 20, 18, 0.7);
+    animation: letterIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .released.is-leaving {
+    animation: letterOut 0.24s ease both;
+  }
+
+  /* --- Entrance --------------------------------------------------------- */
+  .note--enter {
+    animation: cardIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .note--fresh {
+    animation:
+      cardIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both,
+      freshPulse 2.6s ease-out both;
+  }
+  .rise {
+    animation: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+
+/* --- Keyframes ---------------------------------------------------------- */
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes freshPulse {
+  0% {
+    box-shadow:
+      0 0 0 3px color-mix(in srgb, var(--color-sage) 50%, transparent),
+      0 16px 34px -24px rgba(35, 35, 31, 0.55);
+  }
+  100% {
+    box-shadow:
+      0 0 0 0 transparent,
+      0 16px 34px -24px rgba(35, 35, 31, 0.55);
+  }
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes countPop {
+  0% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes dotPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.82); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@keyframes letterIn {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.94) rotate(-0.6deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes letterOut {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .tilt,
+  .tilt-0,
+  .tilt-1,
+  .tilt-2,
+  .tilt-3,
+  .tilt-4 {
+    transform: none !important;
+  }
+}
