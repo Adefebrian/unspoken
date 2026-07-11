@@ -1,14 +1,31 @@
 #cloud-config
-# First-boot setup for the Oracle A1 (Ubuntu aarch64) host. Installs Docker +
-# git only. NO secrets here (cloud-init is stored in instance metadata).
+# First-boot setup for the Oracle A1 (Ubuntu aarch64) host.
+# NO secrets here (cloud-init lives in instance metadata). Only OS + Docker +
+# baseline hardening. The app's .env is added later over SSH.
 package_update: true
 package_upgrade: true
 packages:
   - git
   - ca-certificates
   - curl
+  - fail2ban
+  - unattended-upgrades
+
 runcmd:
-  # Official Docker install (docker-ce + compose v2 plugin), works on arm64.
+  # Docker CE + compose v2 plugin (works on arm64).
   - sh -c "curl -fsSL https://get.docker.com | sh"
   - systemctl enable --now docker
   - usermod -aG docker ubuntu
+  # Automatic security updates.
+  - systemctl enable --now unattended-upgrades
+  # Ban SSH brute-force attempts.
+  - systemctl enable --now fail2ban
+  # Enforce key-only SSH (no passwords, no root login).
+  - sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config
+  - sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config
+  - sh -c "systemctl restart ssh || systemctl restart sshd"
+
+# Security notes:
+# - No inbound app ports: Cloudflare Tunnel connects outbound, so the VM only
+#   needs SSH (22) open in the Oracle security list.
+# - Keep the IMDSv2 "Require authorization header" toggle ON.
