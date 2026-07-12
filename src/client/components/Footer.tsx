@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 export function Footer() {
   return (
     <footer className="mx-auto max-w-4xl px-5 pb-16 pt-6 text-center sm:px-6">
-      <p className="text-2xl font-extrabold tracking-[-0.02em] text-ink sm:text-[1.9rem]">
+      <p className="text-base font-extrabold tracking-[-0.02em] text-ink sm:text-[1.9rem]">
         say the unspoken. carry a little less.
       </p>
       <p className="mt-2.5 text-xs text-ink-faint">
