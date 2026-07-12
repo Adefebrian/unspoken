@@ -1,0 +1,2 @@
+# keep this dir in git so the compose bind mount target exists.
+# real cert files (origin.pem, origin.key) go here on the VM and are gitignored.

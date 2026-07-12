@@ -72,8 +72,8 @@ Optional, from the VPS, to see requests hitting the origin:
 cd ~/unspoken
 docker compose logs app | grep -Ei 'gptbot|claudebot|perplexity|googlebot|bingbot'
 ```
-(Cloudflare passes the real client in `CF-Connecting-IP`; the app trusts the
-proxy hop for its rate-limit hashing.)
+(Cloudflare passes the real client in `CF-Connecting-IP`; nginx restores it into
+`X-Real-IP` for the app's rate-limit hashing.)
 
 ## 4. Submit to search + answer engines (one-time)
 

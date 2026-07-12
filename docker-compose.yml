@@ -1,14 +1,16 @@
 # unspoken, single-box production stack.
 #
-#   cloudflared ──(outbound tunnel)── Cloudflare edge ── users
-#        │
-#      app  (Bun + Hono, scalable: `docker compose up -d --scale app=N`)
-#      ├── postgres   (letters, reactions, reports; on a named volume)
-#      └── redis      (SSE fan-out across app replicas; ephemeral)
+#   users -> Cloudflare edge (DDoS, CDN) -> VM :443
+#                                             |
+#      nginx (TLS via Cloudflare Origin cert, reverse proxy)
+#        |
+#      app  (Bun + Hono, scalable: see DEPLOY.md section 9)
+#      +-- postgres   (letters, reactions, reports; on a named volume)
+#      +-- redis      (SSE fan-out across app replicas; ephemeral)
 #
-# Nothing publishes a host port. The only inbound port on the VM is SSH; the app
-# reaches the internet only through Cloudflare's outbound tunnel. Postgres and
-# Redis live on the private compose network, unreachable from the host or WAN.
+# Only nginx publishes host ports (80, 443), ideally locked to Cloudflare IPs.
+# app/postgres/redis have no host port and live on the private compose network,
+# unreachable from the host or WAN. See DEPLOY.md.
 
 services:
   postgres:
@@ -108,13 +110,26 @@ services:
         limits:
           memory: 512m
 
-  cloudflared:
-    image: cloudflare/cloudflared:latest
+  # TLS termination + reverse proxy. Holds the Cloudflare Origin Certificate and
+  # proxies to the app. Cloudflare stays in front (Full strict). Only this
+  # service publishes host ports (80, 443).
+  nginx:
+    image: nginx:1.27-alpine
     restart: unless-stopped
-    command: tunnel --no-autoupdate run --token ${CF_TUNNEL_TOKEN}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
     depends_on:
       app:
-        condition: service_started
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:80 >/dev/null 2>&1 || true; nginx -t >/dev/null 2>&1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
     deploy:
       resources:
         limits:
