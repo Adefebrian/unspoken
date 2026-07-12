@@ -50,7 +50,7 @@ export function UnspokenCard({ u, index = 0, fresh, onReact, onReport }: Props) 
 
   return (
     <article
-      className={`note flex flex-col p-5 ${fresh ? "note--fresh" : "note--enter"}`}
+      className={`note flex flex-col p-4 sm:p-5 ${fresh ? "note--fresh" : "note--enter"}`}
       style={{ animationDelay: `${Math.min(index, 9) * 55}ms` }}
     >
       {/* Whole letter body is a button: opens the full letter, even when short. */}
@@ -60,7 +60,7 @@ export function UnspokenCard({ u, index = 0, fresh, onReact, onReport }: Props) 
         aria-label="Open this letter in full"
         className="note-open"
       >
-        <p ref={bodyRef} className="note-hand text-[1.22rem] note-clamp">
+        <p ref={bodyRef} className="note-hand text-[1.05rem] note-clamp sm:text-[1.22rem]">
           {u.body}
         </p>
         {clamped && <span className="mt-1 block text-sm font-medium text-sage">read the rest →</span>}

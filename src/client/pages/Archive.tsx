@@ -64,7 +64,7 @@ export function Archive() {
   return (
     <main className="mx-auto max-w-4xl px-5 pb-10 sm:px-6">
       <section className="py-7 text-center">
-        <h1 className="rise font-hand text-[2.5rem] font-bold text-ink sm:text-5xl">
+        <h1 className="rise font-hand text-[1.95rem] font-bold text-ink sm:text-5xl">
           everything left unsaid
         </h1>
         <p className="mt-2 text-sm text-ink-soft">
@@ -91,7 +91,7 @@ export function Archive() {
         <WallSkeleton />
       ) : error ? (
         <div className="note p-8 text-center">
-          <p className="font-hand text-2xl text-ink-soft">couldn't load this page.</p>
+          <p className="font-hand text-xl text-ink-soft sm:text-2xl">couldn't load this page.</p>
           <button
             type="button"
             onClick={() => load(page)}
@@ -101,7 +101,7 @@ export function Archive() {
           </button>
         </div>
       ) : items.length === 0 ? (
-        <p className="note p-8 text-center font-hand text-2xl text-ink-soft">
+        <p className="note p-8 text-center font-hand text-xl text-ink-soft sm:text-2xl">
           nothing on this page.
         </p>
       ) : (

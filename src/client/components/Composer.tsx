@@ -64,7 +64,7 @@ export function Composer({ onCreated }: { onCreated?: (u: UnspokenDTO) => void }
         }}
         placeholder={placeholder}
         rows={3}
-        className="note-hand w-full resize-none bg-transparent text-[1.35rem] placeholder:text-ink-faint focus:outline-none"
+        className="note-hand w-full resize-none bg-transparent text-[1.12rem] placeholder:text-ink-faint focus:outline-none sm:text-[1.35rem]"
       />
 
       <div className="mt-3 flex justify-end">

@@ -77,11 +77,11 @@ export function Home() {
         {announce}
       </p>
       <section className="pb-6 pt-3 text-center sm:pt-6">
-        <h1 className="rise font-hand text-[2.9rem] font-bold leading-[1.02] text-ink sm:text-6xl">
+        <h1 className="rise font-hand text-[2.1rem] font-bold leading-[1.04] text-ink sm:text-6xl">
           let it all out.
         </h1>
         <p
-          className="rise mx-auto mt-3 max-w-xl text-[15px] leading-relaxed text-ink-soft"
+          className="rise mx-auto mt-3 max-w-xl text-sm leading-relaxed text-ink-soft sm:text-[15px]"
           style={{ animationDelay: "110ms" }}
         >
           you've held it in for so long. let it live here instead of your chest,
@@ -92,7 +92,7 @@ export function Home() {
       <Composer onCreated={(u) => addUnspoken(u, true)} />
 
       <div className="mb-4 mt-9 flex items-center gap-2">
-        <h2 className="font-hand text-2xl text-ink">fresh off the chest</h2>
+        <h2 className="font-hand text-xl text-ink sm:text-2xl">fresh off the chest</h2>
         <span
           className={`inline-block h-2 w-2 rounded-full ${
             connected ? "bg-sage" : "bg-ink-faint"
@@ -141,7 +141,7 @@ function WallSkeleton() {
 function EmptyState() {
   return (
     <div className="note p-8 text-center">
-      <p className="font-hand text-2xl text-ink-soft">it's quiet in here…</p>
+      <p className="font-hand text-xl text-ink-soft sm:text-2xl">it's quiet in here…</p>
       <p className="mt-1 text-sm text-ink-faint">be the first to let something out.</p>
     </div>
   );
@@ -150,7 +150,7 @@ function EmptyState() {
 function ErrorState({ onRetry }: { onRetry: () => void }) {
   return (
     <div className="note p-8 text-center">
-      <p className="font-hand text-2xl text-ink-soft">the wall wouldn't load.</p>
+      <p className="font-hand text-xl text-ink-soft sm:text-2xl">the wall wouldn't load.</p>
       <p className="mt-1 text-sm text-ink-faint">check your connection?</p>
       <button
         type="button"
