@@ -40,12 +40,14 @@ Sitemap: ${site}/sitemap.xml
 `;
 }
 
-export function sitemapXml(site: string): string {
-  const today = new Date().toISOString().slice(0, 10);
+// `lastmod` is the real date of the newest visible letter (YYYY-MM-DD), passed
+// in by the route. Honest freshness lets crawlers trust it and recrawl on real
+// change instead of learning to ignore a date that is always "today".
+export function sitemapXml(site: string, lastmod: string): string {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>${site}/</loc><lastmod>${today}</lastmod><changefreq>hourly</changefreq><priority>1.0</priority></url>
-  <url><loc>${site}/all</loc><lastmod>${today}</lastmod><changefreq>hourly</changefreq><priority>0.8</priority></url>
+  <url><loc>${site}/</loc><lastmod>${lastmod}</lastmod><changefreq>hourly</changefreq><priority>1.0</priority></url>
+  <url><loc>${site}/all</loc><lastmod>${lastmod}</lastmod><changefreq>hourly</changefreq><priority>0.8</priority></url>
 </urlset>
 `;
 }

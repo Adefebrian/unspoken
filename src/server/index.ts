@@ -9,6 +9,8 @@ import { clientCount } from "./sse.ts";
 import { getClientIp, hashIp } from "./guard.ts";
 import { createLimiter } from "./limiter.ts";
 import { llmsTxt, robotsTxt, sitemapXml } from "./seo.ts";
+import { renderPage } from "./ssr.ts";
+import { sql } from "./db.ts";
 import { registerAdmin } from "./admin.ts";
 import { startRetention } from "./retention.ts";
 import { env } from "./env.ts";
@@ -29,14 +31,35 @@ try {
   console.error("[unspoken] public/index.html missing. Run `bun run build` first.");
   process.exit(1);
 }
-const homeHtml = indexTemplate.replaceAll("%SITE_URL%", env.SITE_URL);
-// Archive route gets its own canonical / og:url / title (no duplicate content).
-const allHtml = homeHtml
+// Head/shell variants, precomputed once. The SSR markers (<!--SSR_LETTERS-->,
+// <!--SSR_ITEMLIST-->) are left intact here; renderPage fills them per request.
+const homeBase = indexTemplate.replaceAll("%SITE_URL%", env.SITE_URL);
+
+// Archive route gets its own canonical, og:url, title, and all descriptions so
+// it never competes with the home page as duplicate content.
+const HOME_DESC =
+  "unspoken is a free, anonymous wall for the words you never got to say. No names, no judgment. Write what's on your heart and read what others carry.";
+const ALL_DESC =
+  "Browse every anonymous letter on unspoken. Real confessions about love, loss, regret, and the things people never got to say out loud.";
+const allBase = homeBase
   .replaceAll(`href="${env.SITE_URL}/"`, `href="${env.SITE_URL}/all"`)
   .replaceAll(`content="${env.SITE_URL}/"`, `content="${env.SITE_URL}/all"`)
   .replace(
     "<title>unspoken · say what you never could, anonymously</title>",
     "<title>everything unspoken · every anonymous letter left unsaid</title>",
+  )
+  .replaceAll(`content="${HOME_DESC}"`, `content="${ALL_DESC}"`)
+  .replaceAll(
+    `content="A free, anonymous wall for the words you never got to say. No names, no judgment."`,
+    `content="${ALL_DESC}"`,
+  )
+  .replaceAll(
+    `content="A free, anonymous wall for the words you never got to say."`,
+    `content="${ALL_DESC}"`,
+  )
+  .replaceAll(
+    `content="unspoken · say what you never could"`,
+    `content="everything unspoken · every anonymous letter"`,
   );
 
 // --- Security headers ---------------------------------------------------
@@ -123,17 +146,43 @@ for (const f of [
 }
 
 // SEO + GEO endpoints (built with the real site URL).
-app.get("/robots.txt", (c) => c.text(robotsTxt(env.SITE_URL)));
-app.get("/sitemap.xml", (c) => {
-  c.header("Content-Type", "application/xml");
-  return c.body(sitemapXml(env.SITE_URL));
+app.get("/robots.txt", (c) => {
+  c.header("Cache-Control", "public, max-age=3600");
+  return c.text(robotsTxt(env.SITE_URL));
 });
-app.get("/llms.txt", (c) => c.text(llmsTxt(env.SITE_URL)));
+app.get("/sitemap.xml", async (c) => {
+  // Honest lastmod = date of the newest visible letter, so crawlers recrawl on
+  // real change. Answer conditional requests with 304 to save crawl budget.
+  let lastmod = new Date().toISOString();
+  try {
+    const rows = await sql`SELECT max(created_at) AS m FROM unspoken WHERE is_hidden = false`;
+    if (rows[0]?.m) lastmod = new Date(rows[0].m as string).toISOString();
+  } catch {
+    /* fall back to now() if the DB is briefly unavailable */
+  }
+  const etag = `W/"sm-${lastmod}"`;
+  if (c.req.header("if-none-match") === etag) return c.body(null, 304);
+  c.header("ETag", etag);
+  c.header("Last-Modified", new Date(lastmod).toUTCString());
+  c.header("Cache-Control", "public, max-age=3600");
+  c.header("Content-Type", "application/xml");
+  return c.body(sitemapXml(env.SITE_URL, lastmod.slice(0, 10)));
+});
+app.get("/llms.txt", (c) => {
+  c.header("Cache-Control", "public, max-age=3600");
+  return c.text(llmsTxt(env.SITE_URL));
+});
 
-// --- SPA fallback: HTML must stay fresh (it points at hashed assets) ----
-app.get("*", (c) => {
-  c.header("Cache-Control", "no-cache");
-  return c.html(c.req.path.startsWith("/all") ? allHtml : homeHtml);
+// --- HTML: server-render the live feed into the shell, then let the client
+//     app take over #root. Edge-cacheable with stale-while-revalidate so
+//     Cloudflare serves rendered HTML from the nearest PoP; the in-process
+//     cache keeps origin renders to one Postgres query per feed change. -------
+app.get("*", async (c) => {
+  const isAll = c.req.path.startsWith("/all");
+  const page = Math.max(1, parseInt(c.req.query("page") ?? "1", 10) || 1);
+  const html = await renderPage(isAll ? "all" : "home", page, isAll ? allBase : homeBase, env.SITE_URL);
+  c.header("Cache-Control", "public, s-maxage=60, stale-while-revalidate=86400, stale-if-error=86400");
+  return c.html(html);
 });
 
 startRetention();

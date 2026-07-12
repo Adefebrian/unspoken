@@ -11,11 +11,11 @@ test("robots welcomes AI crawlers and points to the sitemap", () => {
   expect(r).toContain(`Sitemap: ${S}/sitemap.xml`);
 });
 
-test("sitemap has both routes with lastmod", () => {
-  const x = sitemapXml(S);
+test("sitemap has both routes with the given lastmod", () => {
+  const x = sitemapXml(S, "2026-07-12");
   expect(x).toContain(`<loc>${S}/</loc>`);
   expect(x).toContain(`<loc>${S}/all</loc>`);
-  expect(x).toContain("<lastmod>");
+  expect(x).toContain("<lastmod>2026-07-12</lastmod>");
 });
 
 test("llms.txt describes the app on the real domain", () => {

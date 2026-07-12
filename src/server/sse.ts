@@ -2,6 +2,7 @@ import type { Context } from "hono";
 import { streamSSE, type SSEStreamingApi } from "hono/streaming";
 import { getClientIp, hashIp } from "./guard.ts";
 import { onBusEvent, publish, type BusEventName } from "./bus.ts";
+import { bumpFeedVersion } from "./ssr.ts";
 
 // SSE hub for this app instance. Every connected browser holds one stream. When
 // an unspoken is created / reacted to / hidden, broadcast() puts the event on
@@ -23,6 +24,9 @@ onBusEvent(({ event, data }) => {
 });
 
 export function broadcast(event: BusEventName, data: unknown): void {
+  // A new or hidden letter changes the visible feed, so drop the SSR cache;
+  // reactions only tweak counts and are not worth invalidating over.
+  if (event === "new" || event === "hide") bumpFeedVersion();
   publish(event, data);
 }
 
