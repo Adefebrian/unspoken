@@ -12,16 +12,14 @@ for (const f of readdirSync("./public/assets")) {
   if (/^(main|styles).*\.(js|css|map)$/.test(f)) rmSync(`./public/assets/${f}`);
 }
 
-// 1. Tailwind CSS -> styles.css, then content-hash it.
+// 1. Tailwind CSS. Inlined into the HTML head (it is ~8 KiB) so there is no
+//    render-blocking stylesheet request in the critical path (better FCP/LCP).
 const cssArgs = ["@tailwindcss/cli", "-i", "./src/client/index.css", "-o", "./public/assets/styles.css"];
 if (isProd) cssArgs.push("--minify");
 await $`bunx ${cssArgs}`;
-const cssBytes = new Uint8Array(await Bun.file("./public/assets/styles.css").arrayBuffer());
-const cssHash = new Bun.CryptoHasher("sha256").update(cssBytes).digest("hex").slice(0, 10);
-const cssName = `styles-${cssHash}.css`;
-await Bun.write(`./public/assets/${cssName}`, cssBytes);
+const cssText = await Bun.file("./public/assets/styles.css").text();
 rmSync("./public/assets/styles.css");
-console.log(`[build] css -> ${cssName}`);
+console.log(`[build] css inlined (${(cssText.length / 1024).toFixed(1)} KiB)`);
 
 // 2. React app -> hashed main-<hash>.js
 const result = await Bun.build({
@@ -50,6 +48,9 @@ console.log(`[build] js -> ${jsName}`);
 //    %SITE_URL% is left intact; the server fills it from PUBLIC_SITE_URL at
 //    startup, so canonical/OG always match the real domain with no build arg.
 let html = await Bun.file("./index.html").text();
-html = html.replaceAll("%CSS%", `/assets/${cssName}`).replaceAll("%JS%", `/assets/${jsName}`);
+html = html
+  // Function replacer so any `$` in the CSS is not treated as a special token.
+  .replace("%HEAD_CSS%", () => `<style>${cssText}</style>`)
+  .replaceAll("%JS%", `/assets/${jsName}`);
 await Bun.write("./public/index.html", html);
 console.log("[build] index.html ✓");

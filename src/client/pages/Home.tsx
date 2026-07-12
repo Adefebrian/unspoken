@@ -98,8 +98,8 @@ export function Home() {
             connected ? "bg-sage" : "bg-ink-faint"
           }`}
           style={connected ? { animation: "dotPulse 2s ease-in-out infinite" } : undefined}
-          aria-label={connected ? "live updates on" : "connecting"}
           title={connected ? "live" : "connecting"}
+          aria-hidden="true"
         />
       </div>
 

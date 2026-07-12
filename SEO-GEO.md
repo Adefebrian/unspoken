@@ -106,6 +106,38 @@ curl -s -o /dev/null -w "%{http_code}\n" -H "If-None-Match: $etag" https://unspo
 curl -sI https://unspoken.zone/ | grep -i cf-cache-status
 ```
 
+## 6. Cloudflare Web Analytics beacon (the console CSP error)
+
+The console error
+`Loading the script 'https://static.cloudflareinsights.com/beacon.min.js ...'
+violates ... "script-src 'self'"` is Cloudflare injecting its Web Analytics
+beacon at the edge. The site's strict CSP blocks it. unspoken already ships its
+own cookieless RUM (web-vitals to `/api/telemetry`), so Cloudflare's is not
+needed.
+
+Fix (recommended): Cloudflare dashboard, `Analytics & Logs -> Web Analytics ->
+(your site) -> Manage site`, turn OFF "Add analytics automatically" (some plans
+show this under `Speed -> Optimization`). That removes the beacon, the extra
+request, and the console error, and keeps the CSP tight.
+
+If you would rather keep Cloudflare Web Analytics, tell me and I will add
+`static.cloudflareinsights.com` to `script-src` and `cloudflareinsights.com` to
+`connect-src` in the app CSP instead.
+
+## 7. Reading the mobile PageSpeed report correctly
+
+The "998 KiB Unattributable" and every `chrome-extension://...` row
+(`phantom.js`, `solana.js`, `sui.js`, `evmAsk.js`, `content.js`) is your
+browser's wallet and other extensions running inside the test tab. It is not
+code the site ships. Those scripts hog the main thread and wreck Speed Index and
+TBT, which is why mobile looked like 16.6 s.
+
+Re-test at https://pagespeed.web.dev (it uses a clean Chrome) or in an Incognito
+window with extensions disabled to see the real numbers. The site's own JavaScript
+is a single ~71 KiB (about 26 KiB gzipped) module, loaded non-render-blocking.
+With the CSS now inlined and the letters server-rendered, FCP and LCP should be
+strong on a clean run.
+
 ## Not worth doing (deliberately skipped)
 
 - Per-letter URLs and a segmented sitemap: fights the ephemeral, anonymous design.

@@ -4,7 +4,9 @@
 // %SITE_URL% is filled by the server at startup, not here.
 const template = await Bun.file("./index.html").text();
 const html = template
-  .replaceAll("%CSS%", "/assets/styles.css")
+  // Dev keeps the CSS external so Tailwind --watch can hot-reload it. Prod
+  // inlines it (see build.ts).
+  .replaceAll("%HEAD_CSS%", '<link rel="stylesheet" href="/assets/styles.css" />')
   .replaceAll("%JS%", "/assets/main.js");
 await Bun.write("./public/index.html", html);
 

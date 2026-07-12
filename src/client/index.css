@@ -22,11 +22,12 @@
   --color-card: #fdfcf8;
   --color-ink: #22221e;
   --color-ink-soft: #5f5b52;
-  --color-ink-faint: #938d7f;
+  /* faint / brand text tones darkened to meet WCAG AA (>= 4.5:1 on paper). */
+  --color-ink-faint: #6f6959;
   --color-line: #d8d0bd;
-  --color-sage: #6f8163;
+  --color-sage: #5d6d50;
   --color-sage-soft: #e9eee1;
-  --color-blush: #cd7f6f;
+  --color-blush: #9f5847;
   --color-blush-soft: #f6e8e3;
 
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
