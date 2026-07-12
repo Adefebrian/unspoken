@@ -81,6 +81,11 @@ const SHELL = (title: string, inner: string) => `<!doctype html>
   .err{color:#b4513f;font-size:.85rem;margin-top:.75rem}
   .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem}
   .logout{background:none;border:1px solid #d8d0bd;border-radius:999px;padding:.35rem .8rem;font-size:.8rem;color:#6f6b62;cursor:pointer}
+  .sec{margin:2rem 0}
+  .sec+.sec{border-top:1px solid #e2dac7;padding-top:1.5rem}
+  .sec-title{font-size:1.05rem;margin:0 0 .15rem;display:flex;align-items:center;gap:.5rem}
+  .sec-count{background:#e7e0cf;color:#6f6b62;border-radius:999px;padding:.05rem .55rem;font-size:.78rem;font-weight:600}
+  .sec-note{color:#6f6b62;font-size:.85rem;margin:0 0 1rem}
 </style>
 </head><body>${inner}</body></html>`;
 
@@ -91,7 +96,7 @@ function loginPage(error?: string): string {
   <p class="brand">unspoken<span>.</span></p>
   <div class="card">
     <h1>admin sign in</h1>
-    <p class="sub">flagged letters only.</p>
+    <p class="sub">moderation.</p>
     <form method="post" action="/rootunspoken/login" autocomplete="off">
       <label for="u">username</label>
       <input id="u" name="username" type="text" autocomplete="username" autofocus required />
@@ -105,14 +110,13 @@ function loginPage(error?: string): string {
   );
 }
 
-function dashboardPage(rows: Row[]): string {
-  const items = rows
-    .map((r) => {
-      const id = esc(String(r.id));
-      return `<article class="card">
+function renderCard(r: Row): string {
+  const id = esc(String(r.id));
+  const reports = Number(r.report_count);
+  return `<article class="card">
   <p class="body">${esc(String(r.body))}</p>
   <div class="meta">
-    <span class="reports">⚑ ${Number(r.report_count)} reports</span>
+    ${reports > 0 ? `<span class="reports">⚑ ${reports} reports</span>` : ""}
     <span>relate ${Number(r.relate_count)} · hug ${Number(r.hug_count)}</span>
     ${r.is_hidden ? '<span class="hidden">hidden</span>' : ""}
     <span class="time">${when(String(r.created_at))}</span>
@@ -121,21 +125,30 @@ function dashboardPage(rows: Row[]): string {
     </form>
   </div>
 </article>`;
-    })
-    .join("\n");
+}
 
+function section(title: string, note: string, rows: Row[], empty: string): string {
+  return `<section class="sec">
+  <h2 class="sec-title">${title} <span class="sec-count">${rows.length}</span></h2>
+  <p class="sec-note">${note}</p>
+  ${rows.length ? rows.map(renderCard).join("\n") : `<p class="empty">${empty}</p>`}
+</section>`;
+}
+
+function dashboardPage(flagged: Row[], recent: Row[]): string {
   return SHELL(
-    "unspoken · flagged",
+    "unspoken · moderation",
     `<div class="wrap">
   <div class="top">
     <div>
       <p class="brand">unspoken<span>.</span></p>
-      <h1>flagged letters</h1>
+      <h1>moderation</h1>
     </div>
     <form method="post" action="/rootunspoken/logout"><button class="logout" type="submit">sign out</button></form>
   </div>
-  <p class="sub">${rows.length} reported · delete removes it permanently from the database</p>
-  ${rows.length ? items : '<p class="empty">No flagged letters right now. All quiet.</p>'}
+  ${section("Flagged", "reported by readers. review and remove.", flagged, "No flagged letters. All quiet.")}
+  ${section("Recent letters", "everything else, newest first (last 100). delete anything that is not okay.", recent, "No letters yet.")}
+  <p class="sub">delete removes a letter permanently from the database.</p>
 </div><script src="/rootunspoken.js"></script>`,
   );
 }
@@ -193,14 +206,21 @@ export function registerAdmin(app: Hono): void {
   app.get("/rootunspoken", async (c) => {
     c.header("Cache-Control", "no-store");
     if (!(await isAuthed(c))) return c.html(loginPage());
-    const rows = (await sql`
+    const flagged = (await sql`
       SELECT id, body, relate_count, hug_count, report_count, is_hidden, created_at
       FROM unspoken
       WHERE report_count > 0
       ORDER BY report_count DESC, created_at DESC
       LIMIT 200
     `) as Row[];
-    return c.html(dashboardPage(rows));
+    const recent = (await sql`
+      SELECT id, body, relate_count, hug_count, report_count, is_hidden, created_at
+      FROM unspoken
+      WHERE report_count = 0 AND is_hidden = false
+      ORDER BY created_at DESC
+      LIMIT 100
+    `) as Row[];
+    return c.html(dashboardPage(flagged, recent));
   });
 
   app.use("/api/admin/*", async (c, next) => {

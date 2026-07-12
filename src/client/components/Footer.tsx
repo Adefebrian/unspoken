@@ -3,11 +3,12 @@ import type { ReactNode } from "react";
 export function Footer() {
   return (
     <footer className="mx-auto max-w-4xl px-5 pb-16 pt-6 text-center sm:px-6">
-      <p className="text-base font-extrabold tracking-[-0.02em] text-ink sm:text-[1.9rem]">
+      <p className="text-sm font-extrabold tracking-[-0.01em] text-ink">
         say the unspoken. carry a little less.
       </p>
-      <p className="mt-2.5 text-xs text-ink-faint">
-        your quiet corner for everything you never got to say. be gentle with each other.
+      <p className="mt-1.5 text-sm text-ink-faint">
+        your quiet corner for everything you never got to say.{" "}
+        <span className="hidden sm:inline">be gentle with each other.</span>
       </p>
 
       <div className="mt-6 flex items-center justify-center gap-3">
