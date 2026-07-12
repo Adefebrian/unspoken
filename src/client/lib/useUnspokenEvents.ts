@@ -15,20 +15,41 @@ export function useUnspokenEvents(handlers: Handlers): void {
   ref.current = handlers;
 
   useEffect(() => {
-    const es = new EventSource("/api/stream");
+    // Open the stream after the page is idle so it is not in the initial
+    // critical path (the first letters come from the REST fetch; SSE is only for
+    // live updates after that).
+    let es: EventSource | null = null;
+    let cancelled = false;
 
-    es.addEventListener("open", () => ref.current.onStatus?.(true));
-    es.addEventListener("error", () => ref.current.onStatus?.(false));
-    es.addEventListener("new", (e) =>
-      ref.current.onNew?.(JSON.parse((e as MessageEvent).data) as UnspokenDTO),
-    );
-    es.addEventListener("reaction", (e) =>
-      ref.current.onReaction?.(JSON.parse((e as MessageEvent).data) as ReactionResult),
-    );
-    es.addEventListener("hide", (e) =>
-      ref.current.onHide?.(JSON.parse((e as MessageEvent).data) as { id: string }),
-    );
+    const connect = () => {
+      if (cancelled) return;
+      es = new EventSource("/api/stream");
+      es.addEventListener("open", () => ref.current.onStatus?.(true));
+      es.addEventListener("error", () => ref.current.onStatus?.(false));
+      es.addEventListener("new", (e) =>
+        ref.current.onNew?.(JSON.parse((e as MessageEvent).data) as UnspokenDTO),
+      );
+      es.addEventListener("reaction", (e) =>
+        ref.current.onReaction?.(JSON.parse((e as MessageEvent).data) as ReactionResult),
+      );
+      es.addEventListener("hide", (e) =>
+        ref.current.onHide?.(JSON.parse((e as MessageEvent).data) as { id: string }),
+      );
+    };
 
-    return () => es.close();
+    const w = window as unknown as {
+      requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number;
+      cancelIdleCallback?: (id: number) => void;
+    };
+    const handle = w.requestIdleCallback
+      ? w.requestIdleCallback(connect, { timeout: 2000 })
+      : window.setTimeout(connect, 600);
+
+    return () => {
+      cancelled = true;
+      if (w.cancelIdleCallback) w.cancelIdleCallback(handle);
+      else clearTimeout(handle);
+      es?.close();
+    };
   }, []);
 }

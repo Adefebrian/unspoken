@@ -77,13 +77,10 @@ export function Home() {
         {announce}
       </p>
       <section className="pb-6 pt-3 text-center sm:pt-6">
-        <h1 className="rise font-hand text-[2.1rem] font-bold leading-[1.04] text-ink sm:text-6xl">
+        <h1 className="font-hand text-[2.1rem] font-bold leading-[1.04] text-ink sm:text-6xl">
           let it all out.
         </h1>
-        <p
-          className="rise mx-auto mt-3 max-w-xl text-sm leading-relaxed text-ink-soft sm:text-[15px]"
-          style={{ animationDelay: "110ms" }}
-        >
+        <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-ink-soft sm:text-[15px]">
           you've held it in for so long. let it live here instead of your chest,
           quietly, with people who just get it.
         </p>

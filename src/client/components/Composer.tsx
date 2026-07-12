@@ -49,7 +49,7 @@ export function Composer({ onCreated }: { onCreated?: (u: UnspokenDTO) => void }
   }
 
   return (
-    <div className="note composer rise p-4 transition-shadow sm:p-6">
+    <div className="note composer p-4 transition-shadow sm:p-6">
 
       <textarea
         ref={areaRef}
