@@ -1,4 +1,4 @@
-import { StrictMode } from "react";
+import { StrictMode, Suspense, lazy } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Header } from "./components/Header.tsx";
@@ -11,7 +11,10 @@ import { ErrorBoundary } from "./components/ErrorBoundary.tsx";
 import { SmoothScroll } from "./lib/SmoothScroll.tsx";
 import { initTelemetry } from "./lib/telemetry.ts";
 import { Home } from "./pages/Home.tsx";
-import { Archive } from "./pages/Archive.tsx";
+
+// The archive is only needed on /all, so it loads as a lazy chunk and stays out
+// of the home (LCP) bundle.
+const Archive = lazy(() => import("./pages/Archive.tsx").then((m) => ({ default: m.Archive })));
 
 initTelemetry();
 
@@ -26,7 +29,7 @@ createRoot(container).render(
           <Header />
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/all" element={<Archive />} />
+            <Route path="/all" element={<Suspense fallback={null}><Archive /></Suspense>} />
             <Route path="*" element={<Home />} />
           </Routes>
           <Footer />

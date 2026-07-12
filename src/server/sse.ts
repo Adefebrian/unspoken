@@ -10,9 +10,12 @@ import { bumpFeedVersion } from "./ssr.ts";
 // we push to every browser connected to THIS instance.
 const clients = new Set<SSEStreamingApi>();
 
-// Connection-exhaustion guards (per instance).
+// Connection-exhaustion guards (per instance). MAX_PER_IP is generous because
+// many real users share one public IP behind carrier-grade NAT / office
+// networks (and one person may open several tabs); too low a cap 429s them and
+// kills realtime. The global cap is the real backstop against exhaustion.
 const MAX_GLOBAL = 2000;
-const MAX_PER_IP = 5;
+const MAX_PER_IP = 40;
 const perIp = new Map<string, number>();
 
 // Deliver any bus event (local or from a peer instance) to local browsers.

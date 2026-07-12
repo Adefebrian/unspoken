@@ -48,6 +48,22 @@ if (!jsOut) {
 const jsName = basename(jsOut.path);
 console.log(`[build] js -> ${jsName}`);
 
+// modulepreload the entry plus the chunks it imports STATICALLY (e.g. the React
+// vendor chunk), so they download in parallel instead of waterfalling after the
+// entry parses. Chunks referenced only via dynamic import() (Lenis, web-vitals,
+// the archive route) are left out on purpose so they stay lazy.
+const entryText = await Bun.file(jsOut.path).text();
+const chunkRe = /["']\.\/(chunk-[A-Za-z0-9_]+\.js)["']/g;
+const dynamicRe = /import\(\s*["']\.\/(chunk-[A-Za-z0-9_]+\.js)["']/g;
+const dynamic = new Set([...entryText.matchAll(dynamicRe)].map((m) => m[1]));
+const staticChunks = [...new Set([...entryText.matchAll(chunkRe)].map((m) => m[1]))].filter(
+  (c) => !dynamic.has(c),
+);
+const preloads = [jsName, ...staticChunks]
+  .map((n) => `<link rel="modulepreload" href="/assets/${n}" />`)
+  .join("\n    ");
+console.log(`[build] preloading ${1 + staticChunks.length} module(s), ${dynamic.size} lazy`);
+
 // 3. Generate public/index.html from the root template with hashed asset paths.
 //    %SITE_URL% is left intact; the server fills it from PUBLIC_SITE_URL at
 //    startup, so canonical/OG always match the real domain with no build arg.
@@ -55,6 +71,7 @@ let html = await Bun.file("./index.html").text();
 html = html
   // Function replacer so any `$` in the CSS is not treated as a special token.
   .replace("%HEAD_CSS%", () => `<style>${cssText}</style>`)
+  .replace("%JS_PRELOADS%", () => preloads)
   .replaceAll("%JS%", `/assets/${jsName}`);
 await Bun.write("./public/index.html", html);
 console.log("[build] index.html ✓");

@@ -7,6 +7,7 @@ const html = template
   // Dev keeps the CSS external so Tailwind --watch can hot-reload it. Prod
   // inlines it (see build.ts).
   .replaceAll("%HEAD_CSS%", '<link rel="stylesheet" href="/assets/styles.css" />')
+  .replaceAll("%JS_PRELOADS%", '<link rel="modulepreload" href="/assets/main.js" />')
   .replaceAll("%JS%", "/assets/main.js");
 await Bun.write("./public/index.html", html);
 

@@ -136,6 +136,8 @@ app.use("/fonts/*", (c, next) => {
   c.header("Cache-Control", "public, max-age=31536000");
   return assetFiles(c, next);
 });
+// Brand assets (favicon, icons, OG, manifest) rarely change; give them a long
+// cache so repeat visits and the manifest fetch stay off the critical path.
 for (const f of [
   "/favicon.svg",
   "/og.png",
@@ -145,7 +147,11 @@ for (const f of [
   "/icon-512.png",
   "/manifest.webmanifest",
 ]) {
-  app.get(f, serveStatic({ path: `./public${f}` }));
+  const serve = serveStatic({ path: `./public${f}` });
+  app.get(f, (c, next) => {
+    c.header("Cache-Control", "public, max-age=604800");
+    return serve(c, next);
+  });
 }
 
 // SEO + GEO endpoints (built with the real site URL).
