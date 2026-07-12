@@ -92,7 +92,7 @@ export function Home() {
       <Composer onCreated={(u) => addUnspoken(u, true)} />
 
       <div className="mb-4 mt-9 flex items-center gap-2">
-        <h2 className="font-hand text-xl text-ink sm:text-2xl">fresh off the chest</h2>
+        <h2 className="font-gochi text-xl text-ink sm:text-2xl">fresh off the chest</h2>
         <span
           className={`inline-block h-2 w-2 rounded-full ${
             connected ? "bg-sage" : "bg-ink-faint"
