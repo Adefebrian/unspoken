@@ -16,11 +16,11 @@
   src: url("/fonts/shantell-sans.woff2") format("woff2");
 }
 @font-face {
-  font-family: "Gochi Hand";
+  font-family: "Patrick Hand";
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("/fonts/gochi-hand.woff2") format("woff2");
+  src: url("/fonts/patrick-hand.woff2") format("woff2");
 }
 
 @theme {
@@ -39,7 +39,7 @@
 
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-hand: "Shantell Sans", "Segoe Script", cursive;
-  --font-gochi: "Gochi Hand", "Shantell Sans", cursive;
+  --font-patrick: "Patrick Hand", "Shantell Sans", cursive;
 
   --radius-note: 16px;
 }
