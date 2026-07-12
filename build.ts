@@ -7,9 +7,10 @@ const mode = isProd ? "production" : "development";
 
 console.log(`[build] mode=${mode}`);
 
-// Clean previous hashed assets so they do not accumulate.
+// Clean previous build output (hashed entry + lazy chunks) so it does not
+// accumulate. Leaves non-build files like .gitkeep in place.
 for (const f of readdirSync("./public/assets")) {
-  if (/^(main|styles).*\.(js|css|map)$/.test(f)) rmSync(`./public/assets/${f}`);
+  if (/\.(js|css|map)$/.test(f)) rmSync(`./public/assets/${f}`);
 }
 
 // 1. Tailwind CSS. Inlined into the HTML head (it is ~8 KiB) so there is no
@@ -28,6 +29,9 @@ const result = await Bun.build({
   naming: "[name]-[hash].[ext]",
   target: "browser",
   minify: isProd,
+  // Emit dynamic import() targets (e.g. Lenis) as separate lazy chunks instead
+  // of inlining them into the entry bundle.
+  splitting: true,
   sourcemap: isProd ? "none" : "linked",
   define: { "process.env.NODE_ENV": JSON.stringify(mode) },
 });

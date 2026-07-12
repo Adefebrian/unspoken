@@ -68,11 +68,14 @@ app.use(
   secureHeaders({
     contentSecurityPolicy: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'"],
+      // Cloudflare Web Analytics beacon (cookieless RUM Cloudflare injects at
+      // the edge): script from static.cloudflareinsights.com, beacon POST to
+      // cloudflareinsights.com. Everything else stays 'self'.
+      scriptSrc: ["'self'", "https://static.cloudflareinsights.com"],
       styleSrc: ["'self'", "'unsafe-inline'"],
       fontSrc: ["'self'"],
       imgSrc: ["'self'", "data:"],
-      connectSrc: ["'self'"],
+      connectSrc: ["'self'", "https://cloudflareinsights.com"],
       objectSrc: ["'none'"],
       baseUri: ["'self'"],
       formAction: ["'self'"],
