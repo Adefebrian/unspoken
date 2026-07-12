@@ -10,12 +10,12 @@ export function startRetention(): void {
 
   const sweep = async () => {
     try {
-      const rows = (await sql`
+      const rows = await sql`
         DELETE FROM unspoken
         WHERE created_at < now() - make_interval(days => ${days})
         RETURNING id
-      `) as unknown[];
-      if (Array.isArray(rows) && rows.length) {
+      `;
+      if (rows.length) {
         console.log(`[unspoken] retention: removed ${rows.length} expired letters`);
       }
     } catch (e) {

@@ -25,5 +25,8 @@ COPY --from=build /app/index.html ./index.html
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s \
   CMD wget -qO- http://127.0.0.1:3000/health || exit 1
-# DATABASE_URL, IP_SALT, PUBLIC_SITE_URL, ADMIN_USER, ADMIN_PASS provided at runtime.
+# Drop privileges: the app only reads its bundle and talks to PG/Redis over the
+# network, never writes to disk, so it runs fine as the image's unprivileged user.
+USER bun
+# DATABASE_URL, REDIS_URL, IP_SALT, PUBLIC_SITE_URL, ADMIN_USER, ADMIN_PASS at runtime.
 CMD ["bun", "run", "src/server/index.ts"]

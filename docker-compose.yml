@@ -1,16 +1,124 @@
+# unspoken, single-box production stack.
+#
+#   cloudflared ──(outbound tunnel)── Cloudflare edge ── users
+#        │
+#      app  (Bun + Hono, scalable: `docker compose up -d --scale app=N`)
+#      ├── postgres   (letters, reactions, reports; on a named volume)
+#      └── redis      (SSE fan-out across app replicas; ephemeral)
+#
+# Nothing publishes a host port. The only inbound port on the VM is SSH; the app
+# reaches the internet only through Cloudflare's outbound tunnel. Postgres and
+# Redis live on the private compose network, unreachable from the host or WAN.
+
 services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    stop_grace_period: 30s
+    shm_size: 256mb
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      # Managed init only; no host locale surprises.
+      POSTGRES_INITDB_ARGS: "--data-checksums"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    # Tuned small for a low-traffic wall on a shared box. Keep max_connections
+    # comfortably above (app replicas x PG_POOL_MAX) + the migrate one-shot.
+    command:
+      - "postgres"
+      - "-c"
+      - "max_connections=100"
+      - "-c"
+      - "shared_buffers=256MB"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    # Password-protected, memory-capped, no persistence (SSE bus + transient
+    # only; every letter lives in Postgres). Losing Redis loses nothing durable.
+    command:
+      - "redis-server"
+      - "--requirepass"
+      - "${REDIS_PASSWORD}"
+      - "--maxmemory"
+      - "256mb"
+      - "--maxmemory-policy"
+      - "allkeys-lru"
+      - "--save"
+      - ""
+      - "--appendonly"
+      - "no"
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" ping | grep -q PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    deploy:
+      resources:
+        limits:
+          memory: 320m
+
+  # One-shot: runs migrations to completion, then exits. The app waits for it.
+  migrate:
+    build: .
+    command: ["bun", "run", "migrate.ts"]
+    env_file: .env
+    restart: "no"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   app:
     build: .
     restart: unless-stopped
+    stop_grace_period: 30s
     env_file: .env
     expose:
       - "3000"
-    # No published ports: Cloudflare Tunnel reaches the app over the internal
-    # network, so the VM needs zero inbound ports open (only SSH).
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    deploy:
+      resources:
+        limits:
+          memory: 512m
 
   cloudflared:
     image: cloudflare/cloudflared:latest
     restart: unless-stopped
     command: tunnel --no-autoupdate run --token ${CF_TUNNEL_TOKEN}
     depends_on:
-      - app
+      app:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          memory: 128m
+
+volumes:
+  pgdata:

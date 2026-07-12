@@ -14,6 +14,12 @@ const PORT = Number(process.env.PORT ?? 3000);
 
 export const env = {
   DATABASE_URL: required("DATABASE_URL"),
+  // Postgres pool size per app process. Keep low so N replicas stay under the
+  // Postgres max_connections ceiling (see docker-compose.yml).
+  PG_POOL_MAX: Number(process.env.PG_POOL_MAX ?? 10),
+  // Redis is optional. Set it to fan out SSE events across app replicas
+  // (multi-instance realtime). Unset => single-instance in-process fan-out.
+  REDIS_URL: process.env.REDIS_URL ?? "",
   IP_SALT: process.env.IP_SALT ?? "unspoken-dev-salt-change-me",
   PORT,
   NODE_ENV,

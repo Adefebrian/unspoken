@@ -1,23 +1,29 @@
 import type { Context } from "hono";
 import { streamSSE, type SSEStreamingApi } from "hono/streaming";
 import { getClientIp, hashIp } from "./guard.ts";
+import { onBusEvent, publish, type BusEventName } from "./bus.ts";
 
-// In-process fan-out hub. Every connected browser holds one SSE stream; when an
-// unspoken is created / reacted to / hidden we push to all of them. Single
-// container by design (see README), so an in-memory set is the lightest
-// reliable option.
+// SSE hub for this app instance. Every connected browser holds one stream. When
+// an unspoken is created / reacted to / hidden, broadcast() puts the event on
+// the bus; the bus delivers it back here (and to peer instances via Redis) and
+// we push to every browser connected to THIS instance.
 const clients = new Set<SSEStreamingApi>();
 
-// Connection-exhaustion guards.
+// Connection-exhaustion guards (per instance).
 const MAX_GLOBAL = 2000;
 const MAX_PER_IP = 5;
 const perIp = new Map<string, number>();
 
-export function broadcast(event: "new" | "reaction" | "hide", data: unknown): void {
+// Deliver any bus event (local or from a peer instance) to local browsers.
+onBusEvent(({ event, data }) => {
   const payload = JSON.stringify(data);
   for (const stream of clients) {
     stream.writeSSE({ event, data: payload }).catch(() => clients.delete(stream));
   }
+});
+
+export function broadcast(event: BusEventName, data: unknown): void {
+  publish(event, data);
 }
 
 export function clientCount(): number {

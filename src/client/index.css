@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* Self-hosted variable fonts (latin subset) — no third-party render-block. */
+/* Self-hosted variable fonts (latin subset), no third-party render-block. */
 @font-face {
   font-family: "Inter";
   font-style: normal;
