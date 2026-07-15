@@ -74,7 +74,9 @@ app.use(
       scriptSrc: ["'self'", "https://static.cloudflareinsights.com"],
       styleSrc: ["'self'", "'unsafe-inline'"],
       fontSrc: ["'self'"],
-      imgSrc: ["'self'", "data:"],
+      // blob: lets the share sheet show its generated story image, which is a
+      // same-origin object URL built client-side from a canvas.
+      imgSrc: ["'self'", "data:", "blob:"],
       connectSrc: ["'self'", "https://cloudflareinsights.com"],
       objectSrc: ["'none'"],
       baseUri: ["'self'"],
