@@ -163,19 +163,27 @@
   .chip {
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: 0.32rem;
     border-radius: 999px;
     border: 1px solid var(--color-line);
     background: var(--color-paper);
-    padding: 0.5rem 0.85rem;
-    min-height: 40px;
-    font-size: 0.82rem;
+    padding: 0.34rem 0.68rem;
+    min-height: 32px;
+    font-size: 0.76rem;
     color: var(--color-ink-soft);
     transition:
       transform 0.15s ease,
       background 0.18s ease,
       color 0.18s ease,
       border-color 0.18s ease;
+  }
+  @media (min-width: 720px) {
+    .chip {
+      gap: 0.4rem;
+      padding: 0.5rem 0.85rem;
+      min-height: 40px;
+      font-size: 0.82rem;
+    }
   }
   @media (hover: hover) {
     .chip:hover:not(:disabled) {
