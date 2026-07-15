@@ -5,6 +5,7 @@ import { Header } from "./components/Header.tsx";
 import { Footer } from "./components/Footer.tsx";
 import { Toaster } from "./components/Toaster.tsx";
 import { LetterModal } from "./components/LetterModal.tsx";
+import { ShareModal } from "./components/ShareModal.tsx";
 import { ReleasedModal } from "./components/ReleasedModal.tsx";
 import { CrisisModal } from "./components/CrisisModal.tsx";
 import { ErrorBoundary } from "./components/ErrorBoundary.tsx";
@@ -35,6 +36,7 @@ createRoot(container).render(
           <Footer />
         </SmoothScroll>
         <LetterModal />
+        <ShareModal />
         <ReleasedModal />
         <CrisisModal />
         <Toaster />

@@ -71,6 +71,17 @@ export function HugIcon() {
   );
 }
 
+export function ShareIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="6" cy="12" r="2.2" stroke="currentColor" strokeWidth="1.6" />
+      <circle cx="17.5" cy="6" r="2.2" stroke="currentColor" strokeWidth="1.6" />
+      <circle cx="17.5" cy="18" r="2.2" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M8 10.9l7.5-3.8M8 13.1l7.5 3.8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export function FlagIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">

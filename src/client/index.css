@@ -263,6 +263,100 @@
     animation: letterOut 0.24s ease both;
   }
 
+  /* --- Share sheet (story export) --------------------------------------- */
+  .share-sheet {
+    position: relative;
+    width: min(400px, 100%);
+    max-height: 90dvh;
+    overflow: auto;
+    background: var(--color-card);
+    border: 1px solid var(--color-line);
+    border-radius: 22px;
+    padding: clamp(1.25rem, 0.8rem + 2vw, 1.75rem);
+    box-shadow: 0 40px 80px -30px rgba(20, 20, 18, 0.7);
+    animation: letterIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .share-sheet.is-leaving {
+    animation: letterOut 0.24s ease both;
+  }
+  .share-stage {
+    display: grid;
+    place-items: center;
+    padding: 0.75rem;
+    border-radius: 16px;
+    background:
+      radial-gradient(120% 80% at 50% 0%, rgba(255, 255, 255, 0.6), transparent 60%),
+      var(--color-paper-2);
+    border: 1px solid var(--color-line);
+  }
+  .share-preview {
+    aspect-ratio: 9 / 16;
+    height: min(58dvh, 460px);
+    width: auto;
+    max-width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 18px 40px -22px rgba(20, 20, 18, 0.6);
+  }
+  .share-preview--loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    background: var(--color-card);
+    border: 1px dashed var(--color-line);
+  }
+  .share-spinner {
+    width: 26px;
+    height: 26px;
+    border-radius: 999px;
+    border: 3px solid var(--color-line);
+    border-top-color: var(--color-sage);
+    animation: spin 0.8s linear infinite;
+  }
+  .share-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 50px;
+    border-radius: 999px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    transition:
+      transform 0.15s ease,
+      background 0.18s ease,
+      opacity 0.18s ease;
+  }
+  .share-btn:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+  .share-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+  .share-btn--primary {
+    background: var(--color-sage);
+    color: var(--color-paper);
+    box-shadow: 0 16px 30px -18px rgba(93, 109, 80, 0.9);
+  }
+  @media (hover: hover) {
+    .share-btn--primary:hover:not(:disabled) {
+      transform: translateY(-1px);
+    }
+  }
+  .share-btn--ghost {
+    background: var(--color-paper);
+    color: var(--color-ink-soft);
+    border: 1px solid var(--color-line);
+  }
+  @media (hover: hover) {
+    .share-btn--ghost:hover:not(:disabled) {
+      color: var(--color-ink);
+    }
+  }
+
   /* --- Entrance --------------------------------------------------------- */
   .note--enter {
     animation: cardIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -333,6 +427,9 @@
 @keyframes dotPulse {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.4; transform: scale(0.82); }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 @keyframes fadeIn {
   from { opacity: 0; }

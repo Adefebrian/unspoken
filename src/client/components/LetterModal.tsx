@@ -5,8 +5,9 @@ import { getFlags, setFlag, type Flags } from "../lib/reacted.ts";
 import { reportUnspoken, sendReaction } from "../lib/api.ts";
 import { relativeTime } from "../lib/time.ts";
 import { toast } from "../lib/toast.ts";
+import { openShare } from "../lib/share.ts";
 import { useFocusTrap } from "../lib/useFocusTrap.ts";
-import { ReactChip, FlagIcon } from "./ReactChip.tsx";
+import { ReactChip, FlagIcon, ShareIcon } from "./ReactChip.tsx";
 
 /** Full-letter viewer. Mounted once at the app root; opened via openLetter(). */
 export function LetterModal() {
@@ -117,16 +118,27 @@ export function LetterModal() {
               <ReactChip kind="relate" active={!!flags.relate} count={counts.relate} onClick={() => react("relate")} size="lg" />
               <ReactChip kind="hug" active={!!flags.hug} count={counts.hug} onClick={() => react("hug")} size="lg" />
             </div>
-            <button
-              type="button"
-              onClick={report}
-              disabled={!!flags.report}
-              aria-label="Report this"
-              title={flags.report ? "reported" : "report"}
-              className="text-ink-faint transition-colors hover:text-blush disabled:opacity-40"
-            >
-              <FlagIcon />
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => u && openShare(u)}
+                aria-label="Share this to your story"
+                title="share to story"
+                className="text-ink-faint transition-colors hover:text-sage"
+              >
+                <ShareIcon />
+              </button>
+              <button
+                type="button"
+                onClick={report}
+                disabled={!!flags.report}
+                aria-label="Report this"
+                title={flags.report ? "reported" : "report"}
+                className="text-ink-faint transition-colors hover:text-blush disabled:opacity-40"
+              >
+                <FlagIcon />
+              </button>
+            </div>
           </div>
         </div>
       </article>

@@ -3,7 +3,8 @@ import type { ReactionType, UnspokenDTO } from "../../shared/types.ts";
 import { getFlags, setFlag } from "../lib/reacted.ts";
 import { relativeTime } from "../lib/time.ts";
 import { openLetter } from "../lib/letter.ts";
-import { ReactChip, FlagIcon } from "./ReactChip.tsx";
+import { openShare } from "../lib/share.ts";
+import { ReactChip, FlagIcon, ShareIcon } from "./ReactChip.tsx";
 
 interface Props {
   u: UnspokenDTO;
@@ -76,6 +77,15 @@ export function UnspokenCard({ u, index = 0, fresh, onReact, onReport }: Props) 
           <time className="text-xs text-ink-faint" dateTime={u.createdAt}>
             {relativeTime(u.createdAt)}
           </time>
+          <button
+            type="button"
+            onClick={() => openShare(u)}
+            aria-label="Share this unspoken to your story"
+            title="share to story"
+            className="text-ink-faint transition-colors hover:text-sage"
+          >
+            <ShareIcon />
+          </button>
           <button
             type="button"
             onClick={report}
