@@ -2,7 +2,7 @@ import type { UnspokenDTO } from "../../shared/types.ts";
 import { relativeTime } from "./time.ts";
 
 // Instagram story canvas: 1080 x 1920 (9:16). Rendered clean and minimalist,
-// on the same warm paper palette as the site, with the unspoken logo footer.
+// on the same warm paper palette as the site, with a minimal domain footer.
 export const STORY_W = 1080;
 export const STORY_H = 1920;
 
@@ -131,38 +131,6 @@ function roundRect(
   ctx.closePath();
 }
 
-// The unspoken glyph mark (3 lines + sage dot), matching the favicon.
-function drawGlyph(ctx: CanvasRenderingContext2D, x: number, y: number, size: number): void {
-  const s = size / 32;
-  ctx.save();
-  ctx.translate(x, y);
-  roundRect(ctx, 0, 0, size, size, 7 * s);
-  ctx.fillStyle = PALETTE.card;
-  ctx.fill();
-  ctx.strokeStyle = PALETTE.line;
-  ctx.lineWidth = 1.5 * s;
-  ctx.stroke();
-
-  ctx.strokeStyle = PALETTE.ink;
-  ctx.lineWidth = 1.9 * s;
-  ctx.lineCap = "round";
-  const line = (fromX: number, toX: number, yy: number) => {
-    ctx.beginPath();
-    ctx.moveTo(fromX * s, yy * s);
-    ctx.quadraticCurveTo(((fromX + toX) / 2) * s, (yy + 0.6) * s, toX * s, yy * s);
-    ctx.stroke();
-  };
-  line(8, 17, 9);
-  line(8, 22, 15);
-  line(8, 16, 21);
-
-  ctx.beginPath();
-  ctx.arc(23.5 * s, 21.5 * s, 2.2 * s, 0, Math.PI * 2);
-  ctx.fillStyle = PALETTE.sage;
-  ctx.fill();
-  ctx.restore();
-}
-
 /** Paint the letter into a fresh 1080x1920 canvas sized for an Instagram story. */
 export async function renderStory(u: UnspokenDTO): Promise<HTMLCanvasElement> {
   await ensureFonts();
@@ -277,31 +245,12 @@ export async function renderStory(u: UnspokenDTO): Promise<HTMLCanvasElement> {
   ctx.fillStyle = PALETTE.inkFaint;
   ctx.fillText(bits.join("  ·  "), STORY_W / 2, metaY + 6);
 
-  // --- Footer: unspoken logo ---------------------------------------------
-  const footY = 1690;
-  ctx.font = '800 58px "Inter", sans-serif';
-  setLetterSpacing(ctx, -1.5);
-  const wordW = ctx.measureText("unspoken").width;
-  const glyphSize = 74;
-  const gap = 26;
-  const dotW = ctx.measureText(".").width;
-  const groupW = glyphSize + gap + wordW + dotW;
-  const startX = (STORY_W - groupW) / 2;
-
-  drawGlyph(ctx, startX, footY - glyphSize + 6, glyphSize);
-
-  ctx.textAlign = "left";
-  ctx.fillStyle = PALETTE.ink;
-  ctx.fillText("unspoken", startX + glyphSize + gap, footY);
-  ctx.fillStyle = PALETTE.sage;
-  ctx.fillText(".", startX + glyphSize + gap + wordW, footY);
-  setLetterSpacing(ctx, 0);
-
+  // --- Footer: domain only, small and minimalist -------------------------
   ctx.textAlign = "center";
   ctx.font = '500 30px "Inter", sans-serif';
   setLetterSpacing(ctx, 3);
   ctx.fillStyle = PALETTE.inkFaint;
-  ctx.fillText("SAY THE UNSPOKEN  ·  UNSPOKEN.ZONE", STORY_W / 2, footY + 72);
+  ctx.fillText("unspoken.zone", STORY_W / 2, 1760);
   setLetterSpacing(ctx, 0);
 
   return canvas;
